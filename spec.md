@@ -11,3 +11,33 @@ Primary goals:
 1. Rapid extraction of agenda items from thousands of documents.
 2. Replace the current Org agenda parser with a new one that is faster and a one-to-one replacement.
 3. Make it an installable package.
+
+## Parser
+
+All Org parsing goes through a single adapter interface. No other code touches a parser directly. The first implementation wraps [orgize](https://github.com/PoiScript/orgize) (Rust). Keeping parsing behind the interface lets the backend be swapped (e.g. for haxorg) without changing the rest of the system.
+
+## Structure
+
+```
+rapid-agenda-extractor/
+├── engine/          # Rust binary: discovery + parse + emit sexp
+│   └── src/
+│       └── parser/  # adapter trait + orgize impl
+├── elisp/           # Emacs package
+└── tests/
+    └── corpus/      # sample .org files
+```
+
+## Configuration
+
+All settings use a `neutron-` prefix. The root folder to scan is `neutron-directory`, which defaults to `org-directory`.
+
+## Integration
+
+Emacs is the front end; the Rust engine does the work. When the agenda opens, Emacs runs the engine as a subprocess. The engine returns the agenda items as sexp, which Emacs reads natively and feeds to the agenda.
+
+## Testing
+
+- Engine: tested with `cargo test`. Covers discovery (ripgrep finding the right paths), parsing, and metadata extraction.
+- Emacs integration: tested with `ert` run under `emacs --batch`. Confirms the agenda uses the new parser and renders items.
+- Speed and navigation: tested manually by the user, who opens the agenda on real files and confirms it's fast and that selecting an item jumps to the right spot.
