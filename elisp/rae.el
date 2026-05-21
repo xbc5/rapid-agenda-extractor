@@ -72,13 +72,17 @@ when the file has none yet."
   (save-excursion
     (goto-char (point-min))
     ;; Flip an existing marker, else add one, because the file must end
-    ;; up with an explicit status.
-    (if (re-search-forward
-         "^\\s-*[#:]\\+?RAE_PROJECT_STATUS:\\s-*\\(active\\|inactive\\)" nil t)
-        (replace-match
-         (if (string= (match-string 1) "active") "inactive" "active")
-         t t nil 1)
-      (insert "#+RAE_PROJECT_STATUS: active\n"))))
+    ;; up with an explicit status.  Report the resulting status so the
+    ;; user sees the change without inspecting the buffer.
+    (let ((status (if (re-search-forward
+                       "^\\s-*[#:]\\+?RAE_PROJECT_STATUS:\\s-*\\(active\\|inactive\\)" nil t)
+                      (let ((new (if (string= (match-string 1) "active")
+                                     "inactive" "active")))
+                        (replace-match new t t nil 1)
+                        new)
+                    (insert "#+RAE_PROJECT_STATUS: active\n")
+                    "active")))
+      (message "status:%s" status))))
 
 (provide 'rae)
 ;;; rae.el ends here
