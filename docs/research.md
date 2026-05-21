@@ -1,19 +1,16 @@
-# Research plan
+# Research
 
-Open questions blocking implementation. Each gets answered with findings inline.
+## Feeding Org our file list — ANSWERED
 
-## Q1. Org agenda injection mechanism
-How does Emacs let external data replace its own parse? What's the supported hook/entry point so the agenda renders our items?
-- [ ] Status: open
+`org-agenda-files` resolves only as a list of paths or a filename string — never a function (`org.el`, `org-agenda-files`). So we cannot point it at a generator. Instead we make our ripgrep result *be* that list, recomputed on each agenda build.
 
-## Q2. Agenda line contract
-What text properties must each agenda line carry for navigation, marking, and commands to work (e.g. `org-marker`, `org-hd-marker`, `type`, `org-category`)?
-- [ ] Status: open
+Two options:
 
-## Q3. Item metadata
-Which fields define an agenda item: TODO state, scheduled, deadline, plain timestamps, tags, priority, category. What the engine must emit.
-- [ ] Status: open
+- Advise the `org-agenda-files` function to return our discovered paths. It is called on every build, so the list stays fresh. Preferred.
+- Set the `org-agenda-files` variable to our result before each build (e.g. from a hook).
 
-## Q4. Discovery marker
-Where does `NEUTRON_PROJECT_STATUS` live — file-level keyword or property drawer — and the exact ripgrep pattern to match `active`.
-- [ ] Status: open
+Either way Org then opens and parses only those files, exactly as normal.
+
+## Discovery marker — SETTLED
+
+File-level keyword `#+RAE_PROJECT_STATUS: active`, matched with `^#\+RAE_PROJECT_STATUS:\s*active`. Recorded in the spec.
