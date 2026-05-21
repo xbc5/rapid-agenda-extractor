@@ -26,9 +26,11 @@ When nil, fall back to `org-directory'."
   :type '(choice (const :tag "Use `org-directory'" nil) directory)
   :group 'rae)
 
-;; The marker is fixed: a file is active when it carries this file-level
-;; keyword.  I match it with ripgrep's default (Rust) regex syntax.
-(defconst rae--status-regexp "^#\\+RAE_PROJECT_STATUS:\\s*active"
+;; A file is active when it carries the marker, written either as a
+;; file-level keyword (#+RAE_PROJECT_STATUS:) or a property-drawer line
+;; (:RAE_PROJECT_STATUS:).  I match both with ripgrep's default (Rust)
+;; regex syntax, allowing leading indentation on drawer lines.
+(defconst rae--status-regexp "^\\s*(#\\+|:)RAE_PROJECT_STATUS:\\s*active"
   "Ripgrep pattern that marks a file as active.")
 
 (defun rae--root ()
@@ -62,15 +64,17 @@ Org calls this on every build, so the list stays fresh."
 
 ;;;###autoload
 (defun rae-toggle-project-status ()
-  "Flip the current file's `#+RAE_PROJECT_STATUS' between values.
-Insert the marker as active when the file has none yet."
+  "Flip the current file's RAE_PROJECT_STATUS between values.
+Match the marker as either a keyword or a property-drawer line, so the
+toggle finds it whichever form the file uses.  Insert the keyword form
+when the file has none yet."
   (interactive)
   (save-excursion
     (goto-char (point-min))
     ;; Flip an existing marker, else add one, because the file must end
     ;; up with an explicit status.
     (if (re-search-forward
-         "^#\\+RAE_PROJECT_STATUS:\\s-*\\(active\\|inactive\\)" nil t)
+         "^\\s-*[#:]\\+?RAE_PROJECT_STATUS:\\s-*\\(active\\|inactive\\)" nil t)
         (replace-match
          (if (string= (match-string 1) "active") "inactive" "active")
          t t nil 1)

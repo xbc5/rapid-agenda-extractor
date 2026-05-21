@@ -32,5 +32,11 @@
            "^#\\+RAE_PROJECT_STATUS: active$"
            (rae-test--toggle "#+TITLE: No marker\n"))))
 
+(ert-deftest rae-toggle-project-status/flips-drawer-marker ()
+  "Test that it flips a marker living in a property drawer."
+  (should (string-match-p
+           "^:RAE_PROJECT_STATUS: inactive$"
+           (rae-test--toggle ":PROPERTIES:\n:RAE_PROJECT_STATUS: active\n:END:\n"))))
+
 (provide 'rae-toggle-project-status-test)
 ;;; rae-toggle-project-status-test.el ends here

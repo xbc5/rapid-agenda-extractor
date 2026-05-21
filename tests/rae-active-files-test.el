@@ -19,8 +19,12 @@
 
 (ert-deftest rae-active-files/finds-active ()
   "Test that it returns every file marked active, including nested ones."
-  (should (equal '("alpha.org" "beta.org" "epsilon.org")
+  (should (equal '("alpha.org" "beta.org" "epsilon.org" "zeta.org")
                  (rae-test--basenames))))
+
+(ert-deftest rae-active-files/finds-drawer-marker ()
+  "Test that it finds the marker in a property drawer, not just a keyword."
+  (should (member "zeta.org" (rae-test--basenames))))
 
 (ert-deftest rae-active-files/excludes-inactive ()
   "Test that it omits files whose status is inactive."

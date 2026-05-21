@@ -1,0 +1,7 @@
+#+TITLE: Zeta
+
+* Project
+:PROPERTIES:
+:RAE_PROJECT_STATUS: active
+:END:
+** TODO Marker lives in a property drawer

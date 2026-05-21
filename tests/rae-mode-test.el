@@ -18,7 +18,7 @@
     (unwind-protect
         (progn
           (rae-mode 1)
-          (should (equal '("alpha.org" "beta.org" "epsilon.org")
+          (should (equal '("alpha.org" "beta.org" "epsilon.org" "zeta.org")
                          (sort (mapcar #'file-name-nondirectory (org-agenda-files))
                                #'string<))))
       (rae-mode -1))))
